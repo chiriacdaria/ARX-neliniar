@@ -1,6 +1,6 @@
-# ARX Nonlinear Model Identification
+# :thought_balloon: ARX Nonlinear Model Identification
 
-## Introduction
+## Introduction 
 
 To address this stage of the project, a basic understanding of linear ARX models is required, as covered in the course material in the ARX Methods section. The nonlinear ARX method is also explained in an annex of the same section.
 
@@ -50,7 +50,7 @@ The identification process involves finding the optimal parameters for the nonli
 You need to implement a function that generates the nonlinear ARX model and another function for parameter identification. Additionally, implement the usage of the model for prediction and simulation.
 
 
-# ARX Nonlinear Model Identification - Project Results
+# :speech_balloon: ARX Nonlinear Model Identification - Project Results
 
 ##Introduction
 In this section, I present the results of the nonlinear ARX model identification project. The goal was to develop a black-box model for a dynamic system using a nonlinear ARX structure. The model's orders, polynomial degree, and parameters were identified and validated using provided datasets.
