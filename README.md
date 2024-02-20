@@ -1,43 +1,364 @@
-Pentru a aborda această etapă a proiectului, este necesar să aveți cunoștințe de bază despre modelele ARX liniare, conform materialului din curs, secțiunea Metode ARX. Metoda ARX neliniară este, de asemenea, expusă într-o anexă a aceleiași secțiuni.
+ARX Nonlinear Model Identification
+Introduction
+To address this stage of the project, a basic understanding of linear ARX models is required, as covered in the course material in the ARX Methods section. The nonlinear ARX method is also explained in an annex of the same section.
 
-Se furnizează un set de date măsurat de la un sistem dinamic cu o intrare și o ieșire. Ordinul sistemului nu depășește 3, iar dinamica poate fi neliniară, în timp ce ieșirea poate fi afectată de zgomot. Vom dezvolta un model de tip cutie neagră pentru acest sistem, folosind o structură ARX neliniară sub formă de polinom pentru semnalele de intrare și ieșire anterioare. Un al doilea set de date, măsurat de la același sistem, este furnizat pentru validarea modelului dezvoltat.
+A dataset measured from a dynamic system with input and output is provided. The system's order does not exceed 3, and its dynamics can be nonlinear, while the output can be affected by noise. We aim to develop a black-box model for this system using a nonlinear ARX structure in the form of a polynomial for input and output signals. A second dataset, measured from the same system, is provided for validating the developed model.
 
-Cele două seturi de date sunt furnizate sub formă de fișier MATLAB, în variabilele "id" și "val," ambele fiind obiecte de tip "iddata" din toolbox-ul de identificare a sistemelor. Intrarea, ieșirea și perioada de eșantionare sunt disponibile în câmpurile "u," "y," și "Ts" ale acestor obiecte. În cazul în care toolbox-ul nu este instalat, aceleași seturi de date sunt furnizate și sub formă vectorială, "id array" și "val array," fiecare matrice având structura: valorile de timp pe prima coloană, intrarea pe a doua, și ieșirea pe ultima coloană.
+The datasets are provided in MATLAB files, in the variables "id" and "val," both being "iddata" objects from the systems identification toolbox. The input, output, and sampling period are available in the "u," "y," and "Ts" fields of these objects. In case the toolbox is not installed, the same datasets are provided in vector format, "id array" and "val array," each matrix having the structure: time values in the first column, input in the second, and output in the last column.
 
-Un model ARX neliniar, cu ordinele na, nb, și întârzierea nk, utilizând aceeași convenție ca și funcția MATLAB "arx," are structura:
+A nonlinear ARX model, with orders na, nb, and delay nk, using the same convention as the MATLAB "arx" function, has the structure:
 
-<img width="573" alt="Captură de ecran din 2024-02-20 la 13 40 42" src="https://github.com/chiriacdaria/ARX-neliniar/assets/99746700/fc97c92e-adaa-450c-91e8-1461479804e1">
-unde vectorul de ieșiri și intrări întârziate este notat 
+�
+^
+(
+�
+)
+=
+�
+(
+�
+(
+�
+−
+1
+)
+,
+…
+,
+�
+(
+�
+−
+�
+�
+)
+,
+�
+(
+�
+−
+�
+�
+)
+,
+�
+(
+�
+−
+�
+�
+−
+1
+)
+,
+…
+,
+�
+(
+�
+−
+�
+�
+−
+�
+�
++
+1
+)
+)
+=
+�
+(
+�
+(
+�
+)
+)
+y
+^
+​
+ (k)=p(y(k−1),…,y(k−na),u(k−nk),u(k−nk−1),…,u(k−nk−nb+1))=p(d(k))
 
-d(k)=[y(k−1),...,y(k−na),u(k−nk),u(k−nk−1),...,u(k−nk−nb+1)] '
- , iar 
-p este un polinom de gradul m al acestor variabile.
+where the vector of delayed outputs and inputs is denoted as 
+�
+(
+�
+)
+=
+[
+�
+(
+�
+−
+1
+)
+,
+…
+,
+�
+(
+�
+−
+�
+�
+)
+,
+�
+(
+�
+−
+�
+�
+)
+,
+�
+(
+�
+−
+�
+�
+−
+1
+)
+,
+…
+,
+�
+(
+�
+−
+�
+�
+−
+�
+�
++
+1
+)
+]
+�
+d(k)=[y(k−1),…,y(k−na),u(k−nk),u(k−nk−1),…,u(k−nk−nb+1)] 
+T
+ , and 
+�
+p is a polynomial of degree m in these variables.
 
-De exemplu, dacă 
+For example, if 
+�
+�
+=
+�
+�
+=
+�
+�
+=
+1
+na=nb=nk=1, then 
+�
+=
+[
+�
+(
+�
+−
+1
+)
+,
+�
+(
+�
+−
+1
+)
+]
+�
+d=[y(k−1),u(k−1)] 
+T
+ , and if we have degree 
+�
+=
+2
+m=2, we can explicitly write the polynomial:
 
-na=nb=nk=1, atunci 
+�
+(
+�
+)
+=
+�
+�
+(
+�
+−
+1
+)
++
+�
+�
+(
+�
+−
+1
+)
++
+�
+�
+(
+�
+−
+1
+)
+2
++
+�
+�
+(
+�
+−
+1
+)
+2
++
+�
+�
+(
+�
+−
+1
+)
+�
+(
+�
+−
+1
+)
++
+�
+y(k)=ay(k−1)+bu(k−1)+cy(k−1) 
+2
+ +vu(k−1) 
+2
+ +wu(k−1)y(k−1)+z
 
-d=[y(k−1),u(k−1)]' , și dacă avem gradul 
-m=2, putem scrie explicit polinomul:
-y(k)=ay(k−1)+bu(k−1)+cy(k−1) ^2  +vu(k−1) ^2 +wu(k−1)y(k−1)+z
+The parameters of the model, represented by a, b, c, v, w, z, are real coefficients. Note that the model is nonlinear and contains quadratic terms and products between delayed variables, unlike the standard ARX, which includes only linear terms in 
+�
+(
+�
+−
+1
+)
+y(k−1) and 
+�
+(
+�
+−
+1
+)
+u(k−1). An essential aspect of model (1) is that it is linear in parameters, meaning that the parameters can be found using linear regression.
 
+It is noteworthy that the linear ARX form is a special case of the general form (1), obtained by choosing the degree m = 1, leading to:
 
-Parametrii modelului, reprezentați de a, b, c, v, w, z, sunt coeficienți reali. Notăm că modelul este neliniar și conține termeni pătratici și produse între variabilele întârziate, spre deosebire de ARX-ul standard, care ar include doar termeni liniari în y(k−1) și u(k−1). Un aspect esențial al modelului (1) este că este liniar în parametri, ceea ce înseamnă că parametrii pot fi găsiți folosind metoda regresiei liniare.
+�
+^
+(
+�
+)
+=
+�
+�
+(
+�
+−
+1
+)
++
+�
+�
+(
+�
+−
+1
+)
++
+�
+y
+^
+​
+ (k)=ay(k−1)+bu(k−1)+c
 
-Este important să menționăm că forma liniară a ARX reprezintă un caz special al formei generale (1), obținut prin alegerea gradului m = 1, ceea ce conduce la:
-(k)=ay(k−1)+bu(k−1)+c
-și, în plus, impunând condiția c=0 pentru termenul liber. Fără această condiție, modelul se numește afin.
+and, in addition, imposing the condition 
+�
+=
+0
+c=0 for the free term. Without this condition, the model is called affine.
 
-Cerințele pentru această etapă sunt următoarele. Trebuie să programați o funcție care generează un model ARX neliniar de tip polinomial, cu ordinele na, nb, și gradul m configurabile; nk poate fi lăsat să fie 1. Trebuie, de asemenea, programată procedura de regresie pentru identificarea parametrilor și utilizarea modelului cu intrări noi. Utilizarea acestui model poate fi realizată în două moduri:
+Requirements
+For this stage, you need to program a function that generates a nonlinear ARX model of a polynomial type, with configurable orders na, nb, and degree m; nk can be left as 1. You should also program the regression procedure for parameter identification and the use of the model with new inputs. The use of this model can be done in two ways:
 
-Predictie (cu un pas inainte): Utilizând valorile reale ale ieșirilor întârziate ale sistemului. În exemplul (2), la pasul k, s-ar aplica ecuația (2) folosind variabilele  y(k−1) și u(k−1) în partea dreaptă a egalității.
+Prediction (one step ahead): Using the real values of the delayed outputs of the system. In example (2), at step k, the equation (2) would be applied using the variables 
+�
+(
+�
+−
+1
+)
+y(k−1) and 
+�
+(
+�
+−
+1
+)
+u(k−1) on the right side of the equality.
 
-Simulare: Ieșirile precedente ale sistemului nu sunt disponibile, deci pot fi folosite doar ieșirile anterioare ale modelului însuși. În exemplu, y(k−1) ar fi înlocuit cu valoarea simulată precedentă (k−1) în partea dreaptă a ecuației (2).
+Simulation: Previous outputs of the system are not available, so only previous outputs of the model itself can be used. In this example, 
+�
+(
+�
+−
+1
+)
+y(k−1) would be replaced with the simulated previous value 
+�
+^
+(
+�
+−
+1
+)
+y
+^
+​
+ (k−1) on the right side of equation (2).
 
-Identificați un astfel de model ARX neliniar folosind setul de date de identificare și validați-l pe setul de validare. Acordați atenție ordinilor modelului, precum și gradului polinomului, pentru a obține o performanță cât mai bună pe datele de identificare. Pentru a simplifica procedura de căutare, puteți lua 
+Identify such a nonlinear ARX model using the identification dataset and validate it on the validation dataset. Pay attention to the model orders, as well as the polynomial degree, to achieve the best performance on the identification data. To simplify the search procedure, you can set 
+�
+�
+=
+�
+�
+na=nb.
 
-na=nb. Prezentarea soluției dumneavoastră trebuie să includă cel puțin următoarele elemente:
+Structure Description
+Dataset
+The datasets are provided in MATLAB files, and each contains time, input, and output values. The first 80% of the samples are used for identification, and the remaining 20% for validation.
 
-O introducere care să cuprindă o descriere a problemei.
-O scurtă descriere a structurii aproximatoare și a procedurii de găsire a parametrilor.
-Orice caracteristici esențiale ale soluției 
+Nonlinear ARX Model
+The nonlinear ARX model has a structure described by equation (1), which involves a polynomial of degree m and delayed input and output variables. The coefficients of the model, a, b, c, v, w, z, are real parameters.
+
+Model Identification
+The identification process involves finding the optimal parameters for the nonlinear ARX model. The parameters are obtained using linear regression, as explained in the course material.
+
+Implementation
+You need to implement a function that generates the nonlinear ARX model and another function for parameter identification. Additionally, implement the usage of the model for prediction and simulation.
+
+Results and Evaluation
+Evaluate the model's performance by comparing the predicted and simulated outputs with the real outputs on both the identification and validation datasets. Report the mean squared error for each case.
+
+Conclusion
+Summarize the findings and discuss the identified model's accuracy and applicability. Reflect on any challenges faced during the implementation and suggest potential improvements.
+
+Feel free to include relevant graphs and figures to enhance the clarity of your documentation.
+
+For more detailed information and code, refer to the accompanying Jupyter notebook or script in the repository.
